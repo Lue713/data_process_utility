@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="dbbfc724-a10c-40d8-9069-0692c35f081e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/transfer_function_generator/tf_gen.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,7 +74,7 @@
       <updated>1629287942358</updated>
       <workItem from="1629287944271" duration="150000" />
       <workItem from="1629349848845" duration="2703000" />
-      <workItem from="1629781731796" duration="326000" />
+      <workItem from="1629781731796" duration="1778000" />
     </task>
     <servers />
   </component>
