@@ -12,6 +12,10 @@ class TFGen(object):
         self.all_data['processed_data'] = pd.DataFrame(index_column, columns=['index'])
         # print(self.all_data['processed_data'])
 
+    def write_to_csv(self, dataframe_name, file_path):
+        data = self.all_data[dataframe_name]
+        data.to_csv(file_path)
+
     def my_FFT(self):
         pass
 
@@ -45,7 +49,7 @@ class TFGen(object):
             else:
                 print(self.all_data[name].columns.values.tolist())
 
-    def plot_with_cursor(self):
+    def plot_with_cursor(self, snap = 'NO'):
         pass
 
 
@@ -86,13 +90,12 @@ class SnaptoCursor(object):
         self.txt = ax.text(0.7, 0.9, '', transform=ax.transAxes)
 
     def mouse_move(self, event):
-
         if not event.inaxes:
             return
 
         x, y = event.xdata, event.ydata
-
         indx = min(np.searchsorted(self.x, [x])[0], len(self.x) - 1)
+
         x = self.x[indx]
         y = self.y[indx]
         # update the line positions
@@ -100,5 +103,5 @@ class SnaptoCursor(object):
         self.ly.set_xdata(x)
 
         self.txt.set_text('x=%1.11f\ny=%1.11f' % (x, y))
-        print('x=%1.11f\ny=%1.11f' % (x, y))
+        # print('x=%1.11f\ny=%1.11f' % (x, y))
         plt.draw()
