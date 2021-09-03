@@ -30,9 +30,9 @@ class TFGen(object):
             processed_data[output_column_name] = diffed_data
             # print(self.fine_data)
         elif order is 2:
-            print('order not support yet')
+            print('not support yet')
         else:
-            print('order not support yet')
+            print('not support yet')
 
         self.all_data['processed_data'] = processed_data
 
@@ -45,9 +45,20 @@ class TFGen(object):
             else:
                 print(self.all_data[name].columns.values.tolist())
 
-    def plot_with_cursor(self):
-        pass
-
+    def plot_with_cursor(self, x_data, y_datas, subplot_num = 1, snap = True):
+        fig, ax = plt.subplots(subplot_num)
+        # plt.figure()
+        plt.rcParams['lines.linewidth'] = '1'
+        cursor_list = []
+        for i in range(subplot_num):
+            ax[i].plot(x_data, y_datas[i])
+            ax[i].grid()
+            if snap:
+                cursor_list += [SnaptoCursor(ax[i], x_data, y_datas[i])]
+            else:
+                cursor_list += [Cursor(ax[i])]
+            plt.connect('motion_notify_event', cursor_list[i].mouse_move)
+        plt.show()
 
 class Cursor(object):
     def __init__(self, ax):
@@ -86,13 +97,12 @@ class SnaptoCursor(object):
         self.txt = ax.text(0.7, 0.9, '', transform=ax.transAxes)
 
     def mouse_move(self, event):
-
         if not event.inaxes:
             return
 
         x, y = event.xdata, event.ydata
-
         indx = min(np.searchsorted(self.x, [x])[0], len(self.x) - 1)
+
         x = self.x[indx]
         y = self.y[indx]
         # update the line positions
@@ -100,5 +110,5 @@ class SnaptoCursor(object):
         self.ly.set_xdata(x)
 
         self.txt.set_text('x=%1.11f\ny=%1.11f' % (x, y))
-        print('x=%1.11f\ny=%1.11f' % (x, y))
+        # print('x=%1.11f\ny=%1.11f' % (x, y))
         plt.draw()
