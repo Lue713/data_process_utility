@@ -9,12 +9,22 @@ class TFGen(object):
     def __init__(self, sampling_freq):
         self.all_data = {}
         self.sampling_freq = sampling_freq
+        self.raw_data_len = None
+        self.time_column = None
+        self.freq_column = None
+        self.index_column = None
 
-    def load_data(self, file_path):
+    def load_data(self, file_path, data_type = 't'):
         self.all_data['raw_data'] = pd.read_table(file_path, sep=',')
-        index_column =[i for i in range(self.all_data['raw_data'].shape[0])]
-        self.all_data['processed_data'] = pd.DataFrame(index_column, columns=['index'])
-        # print(self.all_data['processed_data'])
+
+        self.raw_data_len = self.all_data['raw_data'].shape[0]
+        self.index_column =[i for i in range(self.raw_data_len)]
+        self.time_column = ((1/self.sampling_freq) * np.array(self.index_column)).tolist()
+        self.freq_column = np.linspace(0, self.sampling_freq, self.raw_data_len, endpoint=True).tolist()
+        # print(self.freq_column)
+
+        self.all_data['data_time'] = pd.DataFrame(self.time_column, columns=['time'])
+        self.all_data['data_freq'] = pd.DataFrame(self.freq_column, columns=['freq'])
 
     def FFT_1D(self, input_column_name, output_column_name):
         DF_name = self.__search_data_by_name(input_column_name)
@@ -33,22 +43,25 @@ class TFGen(object):
         pass
 
     def diff_forward(self, input_column_name, output_column_name, order = 1):
-        raw_data = self.all_data['raw_data']
-        processed_data = self.all_data['processed_data']
+        # raw_data = self.all_data['raw_data']
+        # processed_data = self.all_data['processed_data']
+        DF_name = self.__search_data_by_name(input_column_name)
+        input_column_data = self.all_data[DF_name][input_column_name].tolist()
 
         if order is 1:
-            raw_column_data = raw_data[input_column_name].tolist()
-            diffed_data = np.diff(raw_column_data).tolist()
+            # raw_column_data = raw_data[input_column_name].tolist()
+            diffed_data = np.diff(input_column_data).tolist()
             diffed_data = [diffed_data[0]] + diffed_data
             # self.fine_data.insert(self.fine_data.shape[1], output_column_name, diffed_data)
-            processed_data[output_column_name] = diffed_data
+            # processed_data[output_column_name] = diffed_data
+            self.all_data[DF_name][output_column_name] = diffed_data
             # print(self.fine_data)
         elif order is 2:
             print('not support yet')
         else:
             print('not support yet')
 
-        self.all_data['processed_data'] = processed_data
+        # self.all_data['processed_data'] = processed_data
 
     def show_current_data(self, show_data = False):
         data_key_list = list(self.all_data)
@@ -125,7 +138,7 @@ class SnaptoCursor(object):
         self.x = x
         self.y = y
         # text location in axes coords
-        self.txt = ax.text(0.7, 0.9, '', transform=ax.transAxes)
+        self.txt = ax.text(0.8, 0.9, '', transform=ax.transAxes)
 
     def mouse_move(self, event):
         if not event.inaxes:
