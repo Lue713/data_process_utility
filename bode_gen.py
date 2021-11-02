@@ -96,11 +96,11 @@ def pidtune(GH, BW, PM):
 alpha = 0.1
 k = 0.5
 GHi = k / (s * (s + alpha))
-Ci_BW = 20
+Ci_BW = 25
 
 GH = GHi
 BW = 2 * np.pi * Ci_BW
-PM = 60
+PM = 40
 print(GH, BW, PM)
 
 from scipy.optimize import minimize
@@ -113,16 +113,24 @@ def optimize_fnc(x):
 
 
 r = minimize(optimize_fnc, [0, 0, 0], method='nelder-mead', options={'xtol': 1e-8, 'disp': True})
-print('Kp, Ki = ', r.x)
+print('Kp, Ki, Kd = ', r.x)
+PID_opt = r.x[0] + r.x[1] / s + (r.x[2] * s)
+OL_opt = GH * PID_opt
+CL_opt = OL_opt/(1+OL_opt)
 
+w = range(1, round(2000. * 2. * np.pi))
+ctrl.bode_plot(OL_opt, omega=w, dB=True, Hz=True, margins=False, wrap_phase=False)
+plt.show()
+ctrl.bode_plot(CL_opt, omega=w, dB=True, Hz=True, margins=False, wrap_phase=False)
+plt.show()
 
-def optimize_fnc(x):
-    PID = x[0] + x[1] / s
-    gm, pm, wg, wp = ctrl.margin(GH * PID)
-    return (pm - PM) ** 2 + (BW - wp) ** 2
-
-r = minimize(optimize_fnc, [0, 0], method='nelder-mead', options={'xtol': 1e-8, 'disp': True})
-print('Kp, Ki = ', r.x)
+# def optimize_fnc(x):
+#     PID = x[0] + x[1] / s
+#     gm, pm, wg, wp = ctrl.margin(GH * PID)
+#     return (pm - PM) ** 2 + (BW - wp) ** 2
+#
+# r = minimize(optimize_fnc, [0, 0], method='nelder-mead', options={'xtol': 1e-8, 'disp': True})
+# print('Kp, Ki = ', r.x)
 
 
 
